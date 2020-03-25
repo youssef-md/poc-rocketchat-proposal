@@ -1,8 +1,73 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, Text, Slider } from 'react-native';
+import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-export default function AudioMessage({ isPlaying, pause, play }) {
+export default function AudioMessage() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [soundObject, setSoundObject] = useState(null);
+
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: false,
+      // shouldDuckAndroid: true, // ?
+      // playThroughEarpieceAndroid: false,
+    });
+  }, []);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       await sound.loadAsync({
+  //         uri:
+  //           'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
+  //       });
+  //       alert('downloaded!');
+  //     } catch (error) {
+  //       alert(error);
+  //     }
+  //   })();
+  // }, []);
+
+  async function createSound() {
+    setIsLoading(true);
+    const { sound } = await Audio.Sound.createAsync(
+      {
+        uri:
+          'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
+      },
+      { shouldPlay: true }
+      // fn _onPlaybackStatusUpdate
+    );
+    setSoundObject(sound);
+    alert('loaded');
+    setIsLoading(false);
+  }
+
+  async function play() {
+    alert('play');
+    if (!soundObject) await createSound();
+    else soundObject.playAsync();
+
+    setIsPlaying(true);
+  }
+
+  async function pause() {
+    alert('pause');
+    if (soundObject) soundObject.pauseAsync();
+    setIsPlaying(false);
+  }
+
+  function onSliderValueChange(value) {
+    alert(value); // só de arrastar já pega
+  }
+
+  function onSliderSlidingComplete(value) {
+    alert('terminou'); // só quando soltar que pega
+    // Buscar por seek
+  }
+
   return (
     <View style={styles.audio}>
       <TouchableOpacity
@@ -10,14 +75,21 @@ export default function AudioMessage({ isPlaying, pause, play }) {
         onPress={isPlaying ? pause : play}
       >
         <Icon
-          name={isPlaying ? 'pause' : 'play-arrow'}
+          name={
+            isLoading ? 'hourglass-empty' : isPlaying ? 'pause' : 'play-arrow'
+          }
           size={25}
           color="#eee"
         />
       </TouchableOpacity>
-      <View style={styles.duration}>
-        <View style={styles.durationCircle} />
-      </View>
+      <Slider
+        value={0}
+        onValueChange={onSliderValueChange}
+        onSlidingComplete={onSliderSlidingComplete}
+        style={{ alignItems: 'stretch', width: 180 }}
+        thumbTintColor="#1279ff"
+        minimumTrackTintColor="#1279ff"
+      />
       <Text style={styles.text}>08:00</Text>
     </View>
   );
@@ -33,7 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   button: {
     width: 40,
@@ -41,12 +113,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1279ff'
+    backgroundColor: '#1279ff',
   },
   duration: {
     backgroundColor: 'rgba(0, 0, 0, .2)',
     width: 160,
-    height: 1
+    height: 1,
   },
   durationCircle: {
     width: 14,
@@ -55,10 +127,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#1279ff',
     position: 'absolute',
     top: -6,
-    left: 0
+    left: 0,
   },
   text: {
     color: '#999',
-    fontSize: 13
-  }
+    fontSize: 13,
+  },
 });
