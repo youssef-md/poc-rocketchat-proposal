@@ -7,6 +7,8 @@ export default function AudioMessage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [soundObject, setSoundObject] = useState(null);
+  const [soundDuration, setSoundDuration] = useState(null);
+  const [soundPosition, setSoundPosition] = useState(null);
 
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -37,12 +39,25 @@ export default function AudioMessage() {
         uri:
           'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
       },
-      { shouldPlay: true }
-      // fn _onPlaybackStatusUpdate
+      { shouldPlay: true },
+      onSoundStatusUpdate
     );
     setSoundObject(sound);
     alert('loaded');
     setIsLoading(false);
+  }
+
+  function onSoundStatusUpdate(status) {
+    if (status.isLoaded) {
+      setSoundPosition(status.positionMillis);
+      setSoundDuration(status.durationMillis);
+    }
+  }
+
+  function getSliderPosition() {
+    if (soundObject && soundDuration && soundPosition)
+      return soundPosition / soundDuration;
+    return 0;
   }
 
   async function play() {
@@ -83,7 +98,7 @@ export default function AudioMessage() {
         />
       </TouchableOpacity>
       <Slider
-        value={0}
+        value={getSliderPosition()}
         onValueChange={onSliderValueChange}
         onSlidingComplete={onSliderSlidingComplete}
         style={{ alignItems: 'stretch', width: 180 }}
