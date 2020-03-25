@@ -11,14 +11,6 @@ export default function AudioMessage() {
   const [soundDuration, setSoundDuration] = useState(null);
   const [soundPosition, setSoundPosition] = useState(null);
 
-  useEffect(() => {
-    Audio.setAudioModeAsync({
-      staysActiveInBackground: false,
-      // shouldDuckAndroid: true, // ?
-      // playThroughEarpieceAndroid: false,
-    });
-  }, []);
-
   async function createSound() {
     setIsLoading(true);
     const { sound } = await Audio.Sound.createAsync(
@@ -30,7 +22,6 @@ export default function AudioMessage() {
       onSoundStatusUpdate
     );
     setSoundObject(sound);
-    alert('loaded');
     setIsLoading(false);
   }
 
@@ -42,7 +33,6 @@ export default function AudioMessage() {
   }
 
   async function play() {
-    // alert('play');
     if (!soundObject) await createSound();
     else soundObject.playAsync();
 
@@ -50,15 +40,26 @@ export default function AudioMessage() {
   }
 
   async function pause() {
-    // alert('pause');
-    if (soundObject) soundObject.pauseAsync();
-    setIsPlaying(false);
+    if (soundObject) {
+      soundObject.pauseAsync();
+      setIsPlaying(false);
+    }
+  }
+
+  async function stop() {
+    if (soundObject) {
+      soundObject.stopAsync();
+      setIsPlaying(false);
+    }
   }
 
   function getSliderPosition() {
-    if (soundObject && soundDuration && soundPosition)
-      return soundPosition / soundDuration;
-    return 0;
+    const sliderDuration = soundPosition / soundDuration;
+    if (sliderDuration === 1) {
+      stop();
+      return 0;
+    }
+    if (soundObject && soundDuration && soundPosition) return sliderDuration;
   }
 
   function onSliderValueChange(value) {
