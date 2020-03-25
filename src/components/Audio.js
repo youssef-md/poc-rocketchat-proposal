@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, Text, Slider } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -17,20 +18,6 @@ export default function AudioMessage() {
       // playThroughEarpieceAndroid: false,
     });
   }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       await sound.loadAsync({
-  //         uri:
-  //           'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
-  //       });
-  //       alert('downloaded!');
-  //     } catch (error) {
-  //       alert(error);
-  //     }
-  //   })();
-  // }, []);
 
   async function createSound() {
     setIsLoading(true);
@@ -54,14 +41,8 @@ export default function AudioMessage() {
     }
   }
 
-  function getSliderPosition() {
-    if (soundObject && soundDuration && soundPosition)
-      return soundPosition / soundDuration;
-    return 0;
-  }
-
   async function play() {
-    alert('play');
+    // alert('play');
     if (!soundObject) await createSound();
     else soundObject.playAsync();
 
@@ -69,18 +50,33 @@ export default function AudioMessage() {
   }
 
   async function pause() {
-    alert('pause');
+    // alert('pause');
     if (soundObject) soundObject.pauseAsync();
     setIsPlaying(false);
   }
 
+  function getSliderPosition() {
+    if (soundObject && soundDuration && soundPosition)
+      return soundPosition / soundDuration;
+    return 0;
+  }
+
   function onSliderValueChange(value) {
-    alert(value); // só de arrastar já pega
+    // When dragging the slider, should pause the audio until the release
+    if (soundObject) {
+      setIsPlaying(false);
+      soundObject.pauseAsync();
+    }
   }
 
   function onSliderSlidingComplete(value) {
-    alert('terminou'); // só quando soltar que pega
-    // Buscar por seek
+    // When releasing the slider, should play the audio in the released duration
+    if (soundObject) {
+      const seekPosition = value * soundDuration;
+      soundObject.setPositionAsync(seekPosition);
+      soundObject.playAsync();
+      setIsPlaying(true);
+    }
   }
 
   return (
@@ -101,7 +97,7 @@ export default function AudioMessage() {
         value={getSliderPosition()}
         onValueChange={onSliderValueChange}
         onSlidingComplete={onSliderSlidingComplete}
-        style={{ alignItems: 'stretch', width: 180 }}
+        style={{ width: 180 }}
         thumbTintColor="#1279ff"
         minimumTrackTintColor="#1279ff"
       />
