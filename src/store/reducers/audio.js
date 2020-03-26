@@ -6,18 +6,26 @@ const INITIAL_STATE = {
 };
 
 export function audio(state = INITIAL_STATE, action) {
-  const newState = { ...state };
-
   switch (action.type) {
-    case 'CREATE_AUDIO_SUCCESS':
-      newState.soundObject = action.sound;
-      break;
+    case 'SET_SOUND_OBJECT':
+      return { ...state, soundObject: action.payload.sound, isPlaying: true };
+
     case 'PLAY_AUDIO_SUCCESS':
-      newState.isPlaying = true;
+      return { ...state, isPlaying: true };
+
+    case 'PAUSE_AUDIO_SUCCESS':
+    case 'STOP_AUDIO_SUCCESS':
+      return { ...state, isPlaying: false };
+
+    case 'SET_SOUND_POSITION':
+      return { ...state, soundPosition: action.payload.position };
+
+    case 'SET_SOUND_DURATION':
+      return { ...state, soundDuration: action.payload.duration };
+
+    case 'CHANGE_AUDIO_SEEK_POSITION':
       break;
-    case 'PAUSE_AUDIO':
-    case 'STOP_AUDIO':
-      newState.isPlaying = false;
+
     default:
       return state;
   }
