@@ -48,11 +48,11 @@ export default function AudioMessage() {
     else dispatch({ type: 'PLAY_AUDIO_REQUEST', payload: { soundObject } });
   }
 
-  async function pause() {
+  function pause() {
     dispatch({ type: 'PAUSE_AUDIO_REQUEST', payload: { soundObject } });
   }
 
-  async function stop() {
+  function stop() {
     dispatch({ type: 'STOP_AUDIO_REQUEST', payload: { soundObject } });
   }
 
@@ -99,10 +99,11 @@ export default function AudioMessage() {
         minimumTrackTintColor="#1279ff"
       />
       <Text style={styles.text}>
-        {formattedSoundPosition &&
-          formattedSoundPosition.getUTCMinutes() +
+        {formattedSoundPosition
+          ? formattedSoundPosition.getUTCMinutes() +
             ':' +
-            formattedSoundPosition.getUTCSeconds()}
+            formattedSoundPosition.getUTCSeconds()
+          : '0:00'}
       </Text>
     </View>
   );

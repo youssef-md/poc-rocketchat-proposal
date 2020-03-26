@@ -1,11 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { StyleSheet, Text, View } from 'react-native';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import AudioMessage from '../components/Audio';
+import AudioHeader from '../components/AudioHeader';
 
 export default function Room() {
+  const soundFinished = useSelector(state => state.soundFinished);
+
   return (
     <View style={styles.container}>
+      {<AudioHeader />}
       <AudioMessage />
     </View>
   );

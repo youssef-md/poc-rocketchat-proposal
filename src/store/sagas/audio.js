@@ -1,31 +1,11 @@
 import { call, put, all, takeLatest } from 'redux-saga/effects';
 import { Audio } from 'expo-av';
 
-// function* createSoundRequest({ uri }) {
-//   const { sound } = await Audio.Sound.createAsync(
-//     { uri },
-//     { shouldPlay: true },
-//     onSoundStatusUpdate
-//   );
-// }
-
-// // function onSoundStatusUpdate({positionMillis, durationMillis}) {
-// //   yield put({
-// //     type: 'SET_SOUND_POSITION',
-// //     payload: { position: positionMillis },
-// //   })
-// //   yield put({
-// //     type: 'SET_SOUND_DURATION',
-// //     payload: { duration: status.durationMillis },
-// //   })
-// // }
 function* playAudioRequest({ payload }) {
   const { soundObject } = payload;
   soundObject.playAsync();
 
-  yield put({
-    type: 'PLAY_AUDIO_SUCCESS',
-  });
+  yield put({ type: 'PLAY_AUDIO_SUCCESS' });
 }
 
 function* pauseAudioRequest({ payload }) {
