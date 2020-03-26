@@ -13,19 +13,18 @@ const { width } = Dimensions.get('window');
 
 export default function AudioHeader() {
   const dispatch = useDispatch();
-  const soundObject = useSelector(state => state.soundObject);
   const isPlaying = useSelector(state => state.isPlaying);
 
   function play() {
-    dispatch({ type: 'PLAY_AUDIO_REQUEST', payload: { soundObject } });
+    dispatch({ type: 'PLAY_AUDIO_REQUEST' });
   }
 
   function pause() {
-    dispatch({ type: 'PAUSE_AUDIO_REQUEST', payload: { soundObject } });
+    dispatch({ type: 'PAUSE_AUDIO_REQUEST' });
   }
 
   function stop() {
-    dispatch({ type: 'STOP_AUDIO_REQUEST', payload: { soundObject } });
+    dispatch({ type: 'STOP_AUDIO_REQUEST' });
   }
 
   return (

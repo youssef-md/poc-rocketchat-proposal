@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Audio } from 'expo-av';
@@ -29,15 +29,18 @@ export default function AudioMessage() {
   }
 
   function onSoundStatusUpdate(status) {
-    if (status.isLoaded) {
+    const { isLoaded, positionMillis, durationMillis, didJustFinish } = status;
+
+    if (didJustFinish) dispatch({ type: 'STOP_AUDIO_REQUEST' });
+    else if (isLoaded) {
       dispatch({
         type: 'SET_SOUND_POSITION',
-        payload: { position: status.positionMillis },
+        payload: { position: positionMillis },
       });
       if (!soundDuration) {
         dispatch({
           type: 'SET_SOUND_DURATION',
-          payload: { duration: status.durationMillis },
+          payload: { duration: durationMillis },
         });
       }
     }
@@ -45,36 +48,29 @@ export default function AudioMessage() {
 
   async function play() {
     if (!soundObject) await createSound();
-    else dispatch({ type: 'PLAY_AUDIO_REQUEST', payload: { soundObject } });
+    else dispatch({ type: 'PLAY_AUDIO_REQUEST' });
   }
 
   function pause() {
-    dispatch({ type: 'PAUSE_AUDIO_REQUEST', payload: { soundObject } });
-  }
-
-  function stop() {
-    dispatch({ type: 'STOP_AUDIO_REQUEST', payload: { soundObject } });
+    dispatch({ type: 'PAUSE_AUDIO_REQUEST' });
   }
 
   function getSliderPosition() {
-    const sliderDuration = soundPosition / soundDuration;
-    if (sliderDuration === 1) {
-      stop();
-      return 0;
-    }
-    if (soundDuration && soundPosition) return sliderDuration;
+    if (soundDuration && soundPosition) return soundPosition / soundDuration;
+    return 0;
   }
 
   function onSliderValueChange() {
-    dispatch({ type: 'PAUSE_AUDIO_REQUEST', payload: { soundObject } });
+    dispatch({ type: 'PAUSE_AUDIO_REQUEST' });
   }
 
   function onSliderSlidingComplete(value) {
     const seekPosition = value * soundDuration;
     dispatch({
       type: 'CHANGE_AUDIO_SEEK_POSITION_REQUEST',
-      payload: { soundObject, seekPosition },
+      payload: { seekPosition },
     });
+
     dispatch({ type: 'PLAY_AUDIO' });
   }
 

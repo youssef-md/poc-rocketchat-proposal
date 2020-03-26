@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { StyleSheet, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { StyleSheet, View } from 'react-native';
 
 import AudioMessage from '../components/Audio';
 import AudioHeader from '../components/AudioHeader';
@@ -10,7 +10,7 @@ export default function Room() {
 
   return (
     <View style={styles.container}>
-      {<AudioHeader />}
+      {!soundFinished && <AudioHeader />}
       <AudioMessage />
     </View>
   );

@@ -1,10 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useSelector } from 'react-redux';
+import { View, StyleSheet } from 'react-native';
+
 import RoomCard from '../components/RoomCard';
+import AudioHeader from '../components/AudioHeader';
 
 export default function RoomsList({ navigation }) {
+  const soundFinished = useSelector(state => state.soundFinished);
+
   return (
     <View style={styles.container}>
+      {!soundFinished && <AudioHeader />}
+      {!soundFinished && <View style={{ height: 30 }} />}
       <RoomCard
         onPress={() => navigation.navigate('Room')}
         thumbnail="G"
