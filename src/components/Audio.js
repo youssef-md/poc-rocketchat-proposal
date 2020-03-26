@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Slider from '@react-native-community/slider';
+import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function AudioMessage() {
@@ -12,71 +13,66 @@ export default function AudioMessage() {
   const soundDuration = useSelector(state => state.soundDuration);
   const soundPosition = useSelector(state => state.soundPosition);
 
-  // async function createSound() {
-  //   const { sound } = await Audio.Sound.createAsync(
-  //     {
-  //       uri:
-  //         'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
-  //     },
-  //     { shouldPlay: true },
-  //     onSoundStatusUpdate
-  //   );
-  //   setSoundObject(sound);
-  // }
+  function createSound() {
+    dispatch(async dispatch => {
+      const { sound } = await Audio.Sound.createAsync(
+        {
+          uri:
+            'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
+        },
+        { shouldPlay: true }
+        // onSoundStatusUpdate
+      );
 
-  // function onSoundStatusUpdate(status) {
-  //   if (status.isLoaded) {
-  //     setSoundPosition(status.positionMillis);
-  //     setSoundDuration(status.durationMillis);
-  //   }
-  // }
+      alert(res.sound);
+      dispatch({ type: 'CREATE_AUDIO_SUCCESS', audio: sound });
+    });
+  }
+
+  function onSoundStatusUpdate(status) {
+    if (status.isLoaded) {
+      setSoundPosition(status.positionMillis);
+      setSoundDuration(status.durationMillis);
+    }
+  }
 
   async function play() {
-    if (!soundObject) {
-      dispatch({
-        type: 'CREATE_AUDIO_REQUEST',
-        uri:
-          'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
-      });
-    } else {
-      dispatch({ type: 'PLAY_AUDIO_REQUEST' });
-    }
+    if (!soundObject) createSound();
+    else soundObject.playAsync();
+
+    setIsPlaying(true);
   }
 
   async function pause() {
-    // if (soundObject) {
-    //   soundObject.pauseAsync();
-    //   setIsPlaying(false);
-    // }
-
-    dispatch({ type: 'PAUSE_AUDIO' });
+    if (soundObject) {
+      soundObject.pauseAsync();
+      setIsPlaying(false);
+    }
   }
 
   async function stop() {
-    // if (soundObject) {
-    //   soundObject.stopAsync();
-    //   setIsPlaying(false);
-    // }
-
-    dispatch({ type: 'STOP_AUDIO' });
+    if (soundObject) {
+      soundObject.stopAsync();
+      setIsPlaying(false);
+    }
   }
 
   function getSliderPosition() {
-    const sliderDuration = soundPosition / soundDuration;
-    if (sliderDuration === 1) {
-      stop();
-      return 0;
-    }
+    return 0;
+    // const sliderDuration = soundPosition / soundDuration;
+    // if (sliderDuration === 1) {
+    //   stop();
+    //   return 0;
+    // }
     // if (soundObject && soundDuration && soundPosition) return sliderDuration;
   }
 
   function onSliderValueChange(value) {
     // When dragging the slider, should pause the audio until the release
-    // if (soundObject) {
-    //   soundObject.pauseAsync();
-    //   setIsPlaying(false);
-    // }
-    dispatch({ type: 'PAUSE_AUDIO' });
+    if (soundObject) {
+      setIsPlaying(false);
+      soundObject.pauseAsync();
+    }
   }
 
   function onSliderSlidingComplete(value) {
