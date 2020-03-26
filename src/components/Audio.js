@@ -13,6 +13,9 @@ export default function AudioMessage() {
   const soundDuration = useSelector(state => state.soundDuration);
   const soundPosition = useSelector(state => state.soundPosition);
 
+  const formattedSoundPosition =
+    soundPosition && new Date(soundDuration - soundPosition);
+
   async function createSound() {
     const { sound } = await Audio.Sound.createAsync(
       {
@@ -31,10 +34,12 @@ export default function AudioMessage() {
         type: 'SET_SOUND_POSITION',
         payload: { position: status.positionMillis },
       });
-      dispatch({
-        type: 'SET_SOUND_DURATION',
-        payload: { duration: status.durationMillis },
-      });
+      if (!soundDuration) {
+        dispatch({
+          type: 'SET_SOUND_DURATION',
+          payload: { duration: status.durationMillis },
+        });
+      }
     }
   }
 
@@ -89,11 +94,16 @@ export default function AudioMessage() {
         value={getSliderPosition()}
         onValueChange={onSliderValueChange}
         onSlidingComplete={onSliderSlidingComplete}
-        style={{ width: 180 }}
+        style={{ width: 200 }}
         thumbTintColor="#1279ff"
         minimumTrackTintColor="#1279ff"
       />
-      <Text style={styles.text}>08:00</Text>
+      <Text style={styles.text}>
+        {formattedSoundPosition &&
+          formattedSoundPosition.getUTCMinutes() +
+            ':' +
+            formattedSoundPosition.getUTCSeconds()}
+      </Text>
     </View>
   );
 }
