@@ -1,56 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import Slider from '@react-native-community/slider';
-import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function AudioMessage() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [soundObject, setSoundObject] = useState(null);
-  const [soundDuration, setSoundDuration] = useState(null);
-  const [soundPosition, setSoundPosition] = useState(null);
+  const dispatch = useDispatch();
 
-  async function createSound() {
-    setIsLoading(true);
-    const { sound } = await Audio.Sound.createAsync(
-      {
-        uri:
-          'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
-      },
-      { shouldPlay: true },
-      onSoundStatusUpdate
-    );
-    setSoundObject(sound);
-    setIsLoading(false);
-  }
+  const soundObject = useSelector(state => state.soundObject);
+  const isPlaying = useSelector(state => state.isPlaying);
+  const soundDuration = useSelector(state => state.soundDuration);
+  const soundPosition = useSelector(state => state.soundPosition);
 
-  function onSoundStatusUpdate(status) {
-    if (status.isLoaded) {
-      setSoundPosition(status.positionMillis);
-      setSoundDuration(status.durationMillis);
-    }
-  }
+  // async function createSound() {
+  //   const { sound } = await Audio.Sound.createAsync(
+  //     {
+  //       uri:
+  //         'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
+  //     },
+  //     { shouldPlay: true },
+  //     onSoundStatusUpdate
+  //   );
+  //   setSoundObject(sound);
+  // }
+
+  // function onSoundStatusUpdate(status) {
+  //   if (status.isLoaded) {
+  //     setSoundPosition(status.positionMillis);
+  //     setSoundDuration(status.durationMillis);
+  //   }
+  // }
 
   async function play() {
-    if (!soundObject) await createSound();
-    else soundObject.playAsync();
-
-    setIsPlaying(true);
+    if (!soundObject) {
+      dispatch({
+        type: 'CREATE_AUDIO_REQUEST',
+        uri:
+          'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
+      });
+    } else {
+      dispatch({ type: 'PLAY_AUDIO_REQUEST' });
+    }
   }
 
   async function pause() {
-    if (soundObject) {
-      soundObject.pauseAsync();
-      setIsPlaying(false);
-    }
+    // if (soundObject) {
+    //   soundObject.pauseAsync();
+    //   setIsPlaying(false);
+    // }
+
+    dispatch({ type: 'PAUSE_AUDIO' });
   }
 
   async function stop() {
-    if (soundObject) {
-      soundObject.stopAsync();
-      setIsPlaying(false);
-    }
+    // if (soundObject) {
+    //   soundObject.stopAsync();
+    //   setIsPlaying(false);
+    // }
+
+    dispatch({ type: 'STOP_AUDIO' });
   }
 
   function getSliderPosition() {
@@ -59,15 +67,16 @@ export default function AudioMessage() {
       stop();
       return 0;
     }
-    if (soundObject && soundDuration && soundPosition) return sliderDuration;
+    // if (soundObject && soundDuration && soundPosition) return sliderDuration;
   }
 
   function onSliderValueChange(value) {
     // When dragging the slider, should pause the audio until the release
-    if (soundObject) {
-      setIsPlaying(false);
-      soundObject.pauseAsync();
-    }
+    // if (soundObject) {
+    //   soundObject.pauseAsync();
+    //   setIsPlaying(false);
+    // }
+    dispatch({ type: 'PAUSE_AUDIO' });
   }
 
   function onSliderSlidingComplete(value) {
@@ -87,9 +96,7 @@ export default function AudioMessage() {
         onPress={isPlaying ? pause : play}
       >
         <Icon
-          name={
-            isLoading ? 'hourglass-empty' : isPlaying ? 'pause' : 'play-arrow'
-          }
+          name={isPlaying ? 'pause' : 'play-arrow'}
           size={25}
           color="#eee"
         />
