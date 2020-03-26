@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   soundFinished: true,
   soundDuration: null,
   soundPosition: null,
+  soundRate: 1,
 };
 
 export function audio(state = INITIAL_STATE, action) {
@@ -30,6 +31,9 @@ export function audio(state = INITIAL_STATE, action) {
 
     case 'SET_SOUND_DURATION':
       return { ...state, soundDuration: action.payload.duration };
+
+    case 'SET_SOUND_RATE_SUCCESS':
+      return { ...state, soundRate: action.payload.soundRate };
 
     default:
       return state;

@@ -16,7 +16,7 @@ export default function RoomsList({ navigation }) {
         onPress={() => navigation.navigate('Room')}
         thumbnail="G"
         title="gsoc2020"
-        lastMessage="youssef.muhamad: Hellooo!"
+        lastMessage="youssef.muhamad sent an audio"
       />
       <RoomCard
         thumbnail="T"

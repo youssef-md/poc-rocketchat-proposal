@@ -1,14 +1,4 @@
 import { call, put, all, takeLatest, select } from 'redux-saga/effects';
-import { Audio } from 'expo-av';
-
-// function* createSound({ payload }) {
-//   const { uri } = payload;
-//   const { sound } = yield call(
-//     Audio.Sound.createAsync,
-//     { uri },
-//     { shouldPlay: true }
-//   );
-// }
 
 function* playAudioRequest() {
   const soundObject = yield select(state => state.soundObject);
@@ -41,6 +31,19 @@ function* stopAudioRequest() {
   }
 }
 
+function* setSoundRateRequest({ payload }) {
+  const soundObject = yield select(state => state.soundObject);
+  const { soundRate } = payload;
+
+  if (soundObject) {
+    soundObject.setRateAsync(soundRate, true);
+    yield put({
+      type: 'SET_SOUND_RATE_SUCCESS',
+      payload: { soundRate },
+    });
+  }
+}
+
 function* changeAudioSeekPositionRequest({ payload }) {
   const soundObject = yield select(state => state.soundObject);
   const { seekPosition } = payload;
@@ -55,6 +58,7 @@ export default all([
   takeLatest('STOP_AUDIO_REQUEST', stopAudioRequest),
   takeLatest('PLAY_AUDIO_REQUEST', playAudioRequest),
   takeLatest('PAUSE_AUDIO_REQUEST', pauseAudioRequest),
+  takeLatest('SET_SOUND_RATE_REQUEST', setSoundRateRequest),
   takeLatest(
     'CHANGE_AUDIO_SEEK_POSITION_REQUEST',
     changeAudioSeekPositionRequest
