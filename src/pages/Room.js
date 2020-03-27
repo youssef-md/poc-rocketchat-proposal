@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import AudioMessage from '../components/Audio';
 import AudioHeader from '../components/AudioHeader';
+import AudioRecorder from '../components/AudioRecorder';
 
 export default function Room() {
   const soundFinished = useSelector(state => state.soundFinished);
@@ -12,6 +13,7 @@ export default function Room() {
     <View style={styles.container}>
       {!soundFinished && <AudioHeader />}
       <AudioMessage />
+      <AudioRecorder />
     </View>
   );
 }
