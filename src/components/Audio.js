@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 export default function AudioMessage() {
   const dispatch = useDispatch();
 
+  const recordedObject = useSelector(state => state.recordedObject);
   const soundObject = useSelector(state => state.soundObject);
   const isPlaying = useSelector(state => state.isPlaying);
   const soundDuration = useSelector(state => state.soundDuration);
@@ -18,10 +19,7 @@ export default function AudioMessage() {
 
   async function createSound() {
     const { sound } = await Audio.Sound.createAsync(
-      {
-        uri:
-          'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_700KB.mp3',
-      },
+      recordedObject,
       { shouldPlay: true },
       onSoundStatusUpdate
     );
@@ -74,35 +72,37 @@ export default function AudioMessage() {
     dispatch({ type: 'PLAY_AUDIO' });
   }
 
-  return (
-    <View style={styles.audio}>
-      <TouchableOpacity
-        style={[styles.button]}
-        onPress={isPlaying ? pause : play}
-      >
-        <Icon
-          name={isPlaying ? 'pause' : 'play-arrow'}
-          size={25}
-          color="#eee"
+  if (recordedObject) {
+    return (
+      <View style={styles.audio}>
+        <TouchableOpacity
+          style={[styles.button]}
+          onPress={isPlaying ? pause : play}
+        >
+          <Icon
+            name={isPlaying ? 'pause' : 'play-arrow'}
+            size={25}
+            color="#eee"
+          />
+        </TouchableOpacity>
+        <Slider
+          value={getSliderPosition()}
+          onValueChange={onSliderValueChange}
+          onSlidingComplete={onSliderSlidingComplete}
+          style={{ width: 200 }}
+          thumbTintColor="#1279ff"
+          minimumTrackTintColor="#1279ff"
         />
-      </TouchableOpacity>
-      <Slider
-        value={getSliderPosition()}
-        onValueChange={onSliderValueChange}
-        onSlidingComplete={onSliderSlidingComplete}
-        style={{ width: 200 }}
-        thumbTintColor="#1279ff"
-        minimumTrackTintColor="#1279ff"
-      />
-      <Text style={styles.text}>
-        {formattedSoundPosition
-          ? formattedSoundPosition.getUTCMinutes() +
-            ':' +
-            formattedSoundPosition.getUTCSeconds()
-          : '0:00'}
-      </Text>
-    </View>
-  );
+        <Text style={styles.text}>
+          {formattedSoundPosition
+            ? formattedSoundPosition.getUTCMinutes() +
+              ':' +
+              formattedSoundPosition.getUTCSeconds()
+            : '0:00'}
+        </Text>
+      </View>
+    );
+  } else return <Text>Audio...</Text>;
 }
 
 const styles = StyleSheet.create({

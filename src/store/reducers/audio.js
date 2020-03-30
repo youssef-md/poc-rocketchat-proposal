@@ -1,4 +1,5 @@
 const INITIAL_STATE = {
+  recordedObject: null,
   soundObject: null,
   isPlaying: false,
   soundFinished: true,
@@ -15,6 +16,13 @@ export function audio(state = INITIAL_STATE, action) {
         soundObject: action.payload.sound,
         isPlaying: true,
         soundFinished: false,
+      };
+
+    case 'SET_RECORDED_OBJECT':
+      console.log(action.payload.recordedObject);
+      return {
+        ...state,
+        recordedObject: action.payload.recordedObject,
       };
 
     case 'PLAY_AUDIO_SUCCESS':
