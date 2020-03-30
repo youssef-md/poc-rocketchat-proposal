@@ -13,8 +13,9 @@ export default function AudioMessage() {
   const soundDuration = useSelector(state => state.soundDuration);
   const soundPosition = useSelector(state => state.soundPosition);
 
-  const formattedSoundPosition =
-    soundPosition && new Date(soundDuration - soundPosition);
+  const formattedSoundPosition = new Date(
+    recordedObject._finalDurationMillis - soundPosition
+  );
 
   async function createSound() {
     const { sound } = await recordedObject.createNewLoadedSoundAsync(
@@ -95,11 +96,9 @@ export default function AudioMessage() {
         minimumTrackTintColor="#1279ff"
       />
       <Text style={styles.text}>
-        {formattedSoundPosition
-          ? formattedSoundPosition.getUTCMinutes() +
-            ':' +
-            formattedSoundPosition.getUTCSeconds()
-          : '0:00'}
+        {formattedSoundPosition.getUTCMinutes() +
+          ':' +
+          formattedSoundPosition.getUTCSeconds()}
       </Text>
     </View>
   );
