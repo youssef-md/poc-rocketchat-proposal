@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -18,11 +17,14 @@ export default function AudioMessage() {
     soundPosition && new Date(soundDuration - soundPosition);
 
   async function createSound() {
-    const { sound } = await Audio.Sound.createAsync(
-      recordedObject,
-      { shouldPlay: true },
+    const { sound } = await recordedObject.createNewLoadedSoundAsync(
+      {
+        shouldCorrectPitch: true,
+        shouldPlay: true,
+      },
       onSoundStatusUpdate
     );
+
     dispatch({ type: 'SET_SOUND_OBJECT', payload: { sound } });
   }
 
@@ -72,37 +74,35 @@ export default function AudioMessage() {
     dispatch({ type: 'PLAY_AUDIO' });
   }
 
-  if (recordedObject) {
-    return (
-      <View style={styles.audio}>
-        <TouchableOpacity
-          style={[styles.button]}
-          onPress={isPlaying ? pause : play}
-        >
-          <Icon
-            name={isPlaying ? 'pause' : 'play-arrow'}
-            size={25}
-            color="#eee"
-          />
-        </TouchableOpacity>
-        <Slider
-          value={getSliderPosition()}
-          onValueChange={onSliderValueChange}
-          onSlidingComplete={onSliderSlidingComplete}
-          style={{ width: 200 }}
-          thumbTintColor="#1279ff"
-          minimumTrackTintColor="#1279ff"
+  return (
+    <View style={styles.audio}>
+      <TouchableOpacity
+        style={[styles.button]}
+        onPress={isPlaying ? pause : play}
+      >
+        <Icon
+          name={isPlaying ? 'pause' : 'play-arrow'}
+          size={25}
+          color="#eee"
         />
-        <Text style={styles.text}>
-          {formattedSoundPosition
-            ? formattedSoundPosition.getUTCMinutes() +
-              ':' +
-              formattedSoundPosition.getUTCSeconds()
-            : '0:00'}
-        </Text>
-      </View>
-    );
-  } else return <Text>Audio...</Text>;
+      </TouchableOpacity>
+      <Slider
+        value={getSliderPosition()}
+        onValueChange={onSliderValueChange}
+        onSlidingComplete={onSliderSlidingComplete}
+        style={{ width: 200 }}
+        thumbTintColor="#1279ff"
+        minimumTrackTintColor="#1279ff"
+      />
+      <Text style={styles.text}>
+        {formattedSoundPosition
+          ? formattedSoundPosition.getUTCMinutes() +
+            ':' +
+            formattedSoundPosition.getUTCSeconds()
+          : '0:00'}
+      </Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

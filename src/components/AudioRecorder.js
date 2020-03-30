@@ -21,9 +21,7 @@ export default function AudioRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   let [audioRecording, setAudioRecording] = useState(null);
 
-  console.log(audioRecording);
-
-  async function onRecordHandler() {
+  async function expoSetAudioModeAsync() {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
       interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
@@ -33,41 +31,27 @@ export default function AudioRecorder() {
       playThroughEarpieceAndroid: false,
       staysActiveInBackground: true,
     });
+  }
 
-    const recording = new Audio.Recording();
-
-    console.log('start record');
+  async function onRecordHandler() {
+    await expoSetAudioModeAsync();
 
     const { granted } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
     if (!granted) alert('Not granted to record!');
 
-    try {
-      await recording.prepareToRecordAsync(
-        Audio.RECORDING_OPTIONS_PRESET_LOW_QUALITY
-      );
-      await recording.startAsync();
-      setAudioRecording(recording);
-      setIsRecording(true);
-      console.log('terminei de gravar');
-    } catch (error) {
-      alert(error);
-    }
+    const recording = new Audio.Recording();
+    await recording.prepareToRecordAsync(
+      Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+    );
+    await recording.startAsync();
+
+    setAudioRecording(recording);
+    setIsRecording(true);
   }
 
   async function onStopRecording() {
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: true,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-      playThroughEarpieceAndroid: false,
-      staysActiveInBackground: true,
-    });
+    await expoSetAudioModeAsync();
 
-    console.log('stop record');
-
-    setIsRecording(false);
     await audioRecording.stopAndUnloadAsync();
 
     dispatch({
@@ -75,10 +59,7 @@ export default function AudioRecorder() {
       payload: { recordedObject: audioRecording },
     });
 
-    // await Audio.setAudioModeAsync({ })
-    // const {} = await recording.createNewLoadedSoundAsync({
-    //   shouldCorrectPitch: shouldCorrectPitch,
-    // });
+    setIsRecording(false);
   }
 
   return (

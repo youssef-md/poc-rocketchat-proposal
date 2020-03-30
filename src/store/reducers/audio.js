@@ -19,7 +19,6 @@ export function audio(state = INITIAL_STATE, action) {
       };
 
     case 'SET_RECORDED_OBJECT':
-      console.log(action.payload.recordedObject);
       return {
         ...state,
         recordedObject: action.payload.recordedObject,

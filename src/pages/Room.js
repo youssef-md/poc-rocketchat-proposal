@@ -8,11 +8,12 @@ import AudioRecorder from '../components/AudioRecorder';
 
 export default function Room() {
   const soundFinished = useSelector(state => state.soundFinished);
+  const recordedObject = useSelector(state => state.recordedObject);
 
   return (
     <View style={styles.container}>
       {!soundFinished && <AudioHeader />}
-      <AudioMessage />
+      {recordedObject && <AudioMessage />}
       <AudioRecorder />
     </View>
   );
